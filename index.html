@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ছাত্র আইডি কার্ড তৈরির টুল</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Galada&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f5;--panel:#ffffff;--ink:#0f172a;--mute:#64748b;--line:#dbe1e8;--accent:#1e3a5f;--accent-h:#16304f;--on:#fff;--field:#fff;--bar:#1e3a5f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--panel:#111a2b;--ink:#e6ebf2;--mute:#94a3b8;--line:#25324a;--accent:#6ea0e0;--accent-h:#86b2ea;--on:#0b1220;--field:#0b1220;--bar:#111a2b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1220;--panel:#111a2b;--ink:#e6ebf2;--mute:#94a3b8;--line:#25324a;--accent:#6ea0e0;--accent-h:#86b2ea;--on:#0b1220;--field:#0b1220;--bar:#111a2b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Bengali","Hind Siliguri","Kalpurush",system-ui,sans-serif;line-height:1.55}
+.top{background:var(--bar);color:#fff;border-bottom:3px solid #c9a227}
+.top .in{max-width:1080px;margin:0 auto;padding:18px 16px}
+.top h1{color:#fff}
+.top .sub{color:#cbd5e1;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.4rem;font-weight:700;margin:0 0 2px;letter-spacing:.1px}
+.sub{color:var(--mute);margin:0 0 20px;font-size:.92rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.panel h2{font-size:1.02rem;font-weight:700;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:.84rem;font-weight:500;color:var(--mute);margin:12px 0 4px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:8px 11px}
+input:hover,select:hover,textarea:hover{border-color:var(--mute)}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+textarea{resize:vertical;min-height:58px}
+.colors{display:flex;gap:10px;margin-top:6px}
+.sw{width:30px;height:30px;border-radius:6px;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+button.b{font:inherit;font-weight:600;font-size:.92rem;border-radius:6px;padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+button.b:hover{border-color:var(--mute)}
+button.p{background:var(--accent);color:var(--on);border-color:var(--accent)}
+button.p:hover{background:var(--accent-h);border-color:var(--accent-h)}
+.stage{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;padding:14px 0;background:var(--bg);border-radius:6px}
+.zoom{zoom:1.45;box-shadow:0 2px 8px rgba(15,23,42,.18);border-radius:3mm}
+.list{margin-top:20px}
+.item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item img,.item .ph{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--line);flex:none}
+.item .t{flex:1;min-width:0;font-weight:600}
+.item .t small{color:var(--mute);display:block;font-weight:400}
+.empty{color:var(--mute);margin:0}
+.hint{font-size:.84rem;color:var(--mute);margin-top:10px}
+
+/* ---- Card (fixed light colours, real size) ---- */
+.card{--c:#1e3a5f;width:54mm;height:86mm;background:#fff;color:#0f172a;border:.3mm solid #cbd5e1;border-radius:3mm;overflow:hidden;display:flex;flex-direction:column;font-size:8pt;position:relative;break-inside:avoid;font-family:"Noto Sans Bengali","Hind Siliguri",sans-serif;line-height:1.3}
+.card .hd{background:var(--c);color:#fff;text-align:center;padding:3.5mm 2mm 5mm;font-weight:700;font-size:9.5pt;line-height:1.2;border-bottom:.8mm solid #c9a227}
+.card .hd small{display:block;font-weight:500;font-size:6.5pt;opacity:.9;margin-top:.8mm;letter-spacing:.1mm}
+.card .ph{width:25mm;height:30mm;margin:-2.5mm auto 0;border:.8mm solid #fff;outline:.3mm solid #cbd5e1;background:#e2e8f0;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:6.5pt;border-radius:1.5mm;position:relative;z-index:1}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .nm{text-align:center;font-weight:700;font-size:11pt;margin:2.5mm 2mm 1.5mm;line-height:1.2;color:#0f172a}
+.card dl{margin:0 5mm;display:grid;grid-template-columns:auto 1fr;gap:0}
+.card dt{color:#64748b;padding:.5mm 2.5mm .5mm 0;border-bottom:.2mm solid #e2e8f0}
+.card dd{margin:0;font-weight:600;padding:.5mm 0;border-bottom:.2mm solid #e2e8f0}
+.card dt:nth-last-child(2),.card dd:last-child{border-bottom:0}
+.card .ft{margin-top:auto;background:var(--c);color:#fff;text-align:center;padding:1.5mm;font-size:7pt;font-weight:500}
+.card.back{padding:5mm 5mm 0}
+.card.back h4{margin:0 0 .8mm;font-size:7.5pt;font-weight:700;color:var(--c)}
+.card.back p{margin:0 0 2.5mm;white-space:pre-line}
+.card .sig{margin-top:auto;margin-bottom:3mm;text-align:center;font-size:6.5pt;color:#64748b}
+.card .sig i{display:block;border-top:.25mm solid #0f172a;margin:0 8mm .8mm}
+.card .note{font-size:6.5pt;color:#64748b;border-top:.25mm solid #e2e8f0;padding-top:2mm}
+
+.card.land{width:86mm;height:54mm}
+.card.land .hd{padding:2.2mm 2mm 2.4mm}
+.card.land .bd{display:flex;gap:3.5mm;padding:2.5mm 4mm;flex:1;min-height:0;align-items:flex-start}
+.card.land .ph{width:21mm;height:26mm;margin:0;flex:none}
+.card.land .in{flex:1;min-width:0}
+.card.land .nm{text-align:left;margin:0 0 1mm;font-size:10pt}
+.card.land dl{margin:0;font-size:7.5pt}
+.card.back.land{display:grid;grid-template-columns:1fr 1fr;gap:0 4mm;align-content:start;padding:4mm 5mm 2mm}
+.card.back.land .note{grid-column:1/-1;align-self:end}
+.card.land .sig{margin-top:1mm;margin-bottom:0}
+.card.land .sig br{display:none}
+/* ---- Student/teacher card: safe wrapping ---- */
+.card dd,.card .nm,.card .hd{overflow-wrap:anywhere}
+.card dl{min-width:0;grid-template-columns:auto minmax(0,1fr)}
+.hid{display:none!important}
+.zoom:empty{display:none}
+.row3{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type="color"]{padding:2px;height:36px;cursor:pointer}
+.sublabel{font-size:.78rem;margin:0 0 3px}
+#cloud{margin-bottom:20px}
+#cloud .cl-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#cloud .btns{margin-top:12px}
+.cl-st{margin:0 0 4px;font-size:.92rem}
+.cl-ok{color:#15803d}.cl-err{color:#b91c1c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cl-ok{color:#4ade80}:root:not([data-theme="light"]) .cl-err{color:#f87171}}
+:root[data-theme="dark"] .cl-ok{color:#4ade80}:root[data-theme="dark"] .cl-err{color:#f87171}
+@media (max-width:560px){#cloud .cl-row{grid-template-columns:1fr}}
+button:disabled{opacity:.55;cursor:default}
+
+/* ---- Event badge (70 x 100 mm) ---- */
+.card.ev{width:70mm;height:100mm;padding:2.4mm;background:#fff;border:.3mm solid #cbd5e1;border-radius:2.5mm;font-size:8pt}
+.ev .evf{flex:1;min-height:0;display:flex;flex-direction:column;border:.5mm solid var(--r);padding:1.2mm;gap:1mm}
+.ev [data-fit]{display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;flex:none;padding:0 .8mm;line-height:1.2}
+.ev [data-fit]>span{display:block;white-space:nowrap}
+.ev [data-fit="2"]>span{white-space:normal;width:100%}
+.ev .evh{height:9mm;background:var(--g);color:#fff;font-weight:700;font-size:calc(10pt*var(--k,1))}
+.ev .evs{height:7mm;color:var(--b);font-weight:700;font-size:calc(8.5pt*var(--k,1))}
+.ev .evt{height:19mm;color:var(--r);font-family:"Galada","Noto Sans Bengali",cursive;font-size:calc(23pt*var(--k,1));line-height:1.15}
+.ev .evy{height:6mm;color:var(--g);font-weight:700;font-size:calc(13pt*var(--k,1))}
+.ev .evl{flex:1;min-height:0;position:relative;overflow:hidden}
+.ev .evl>*{position:absolute;left:.5mm;top:.5mm;width:calc(100% - 1mm);height:calc(100% - 1mm);object-fit:contain}
+.ev .evv{height:9mm;color:var(--p);font-weight:700;font-size:calc(14pt*var(--k,1))}
+.ev .eva{height:7mm;color:var(--b);font-weight:600;font-size:calc(11pt*var(--k,1))}
+.ev .evb{height:9mm;background:var(--b);color:#fff;font-weight:700;font-size:calc(11pt*var(--k,1))}
+#ov{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;background:rgba(8,12,22,.95);color:#fff;text-align:center;padding:16px;overflow:auto}
+#ov.on{display:flex}
+#ovb{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:12px}
+#ovc{margin-top:16px;margin-bottom:auto}
+#ov p{margin:4px 0;color:#cbd5e1;max-width:36ch}
+#ovb img{width:min(90vw,430px);border-radius:12px}
+#zw{cursor:pointer;touch-action:manipulation}
+#sheet{display:none}
+@media print{
+ @page{size:A4;margin:8mm}
+ body{background:#fff}
+ .wrap,.top,#ov{display:none!important}
+ #sheet{display:flex;flex-wrap:wrap;gap:4mm}
+ .card{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+ <h1>আইডি কার্ড তৈরির টুল</h1>
+ <p class="sub">তথ্য লিখুন, ছবি দিন, কার্ড দেখুন এবং একসাথে সবার কার্ড প্রিন্ট করুন।</p>
+</div></header>
+<div class="wrap">
+
+ <section class="panel" id="cloud" aria-labelledby="h-cloud">
+  <h2 id="h-cloud">ক্লাউড সংরক্ষণ (Firebase)</h2>
+  <p class="cl-st" id="cl-st" role="status">ক্লাউডে সংযোগ হচ্ছে…</p>
+  <form id="cl-in" class="hid" novalidate>
+   <div class="cl-row">
+    <div><label for="cl-email">ইমেইল</label><input id="cl-email" type="email" autocomplete="email"></div>
+    <div><label for="cl-pass">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label><input id="cl-pass" type="password" autocomplete="current-password"></div>
+   </div>
+   <div class="btns">
+    <button class="b p" id="cl-login" type="submit">লগইন</button>
+    <button class="b" id="cl-signup" type="button">নতুন অ্যাকাউন্ট খুলুন</button>
+    <button class="b" id="cl-forgot" type="button">পাসওয়ার্ড ভুলে গেছেন?</button>
+   </div>
+  </form>
+  <div id="cl-out" class="hid">
+   <div class="btns" style="margin-top:0">
+    <button class="b" id="cl-refresh" type="button">ক্লাউড থেকে নতুন করে আনুন</button>
+    <button class="b" id="cl-logout" type="button">লগআউট</button>
+   </div>
+  </div>
+ </section>
+
+ <div class="grid">
+  <section class="panel" aria-labelledby="h-form">
+   <h2 id="h-form">ছাত্রের তথ্য</h2>
+   <div class="row"><div><label for="role">কার্ডের ধরন</label><select id="role"><option value="student">ছাত্র</option><option value="teacher">শিক্ষক</option><option value="event">ইভেন্ট ব্যাজ (সভা / অনুষ্ঠান)</option></select></div><div id="orw"><label for="orient">আকৃতি</label><select id="orient"><option value="port">দাঁড়ানো (পোর্ট্রেট)</option><option value="land">শোয়ানো (ল্যান্ডস্কেপ)</option></select></div></div>
+   <div id="stf">
+   <label for="school">প্রতিষ্ঠানের নাম</label>
+   <input id="school" value="আদর্শ উচ্চ বিদ্যালয়">
+   <label for="saddr">প্রতিষ্ঠানের ঠিকানা</label>
+   <input id="saddr" value="গাজীপুর, ঢাকা">
+   <label for="name">ছাত্রের নাম</label>
+   <input id="name" value="মোঃ রাকিব হাসান">
+   <div class="row">
+    <div><label for="cls">শ্রেণি</label><input id="cls" value="নবম"></div>
+    <div><label for="roll">রোল</label><input id="roll" value="১২"></div>
+   </div>
+   <div class="row">
+    <div><label for="sid">আইডি নম্বর</label><input id="sid" value="2026-0112"></div>
+    <div><label for="blood">রক্তের গ্রুপ</label>
+     <select id="blood"><option value="">—</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>O+</option><option>O−</option><option>AB+</option><option>AB−</option></select></div>
+   </div>
+   <div class="row">
+    <div><label for="phone">অভিভাবকের ফোন</label><input id="phone" value="01700-000000" inputmode="tel"></div>
+    <div><label for="valid">মেয়াদ</label><input id="valid" value="ডিসেম্বর ২০২৬"></div>
+   </div>
+   <label for="addr2">ছাত্রের ঠিকানা</label>
+   <textarea id="addr2">গ্রাম: উত্তরপাড়া, ডাকঘর: গাজীপুর সদর</textarea>
+   <label for="photo">ছবি</label>
+   <input id="photo" type="file" accept="image/*">
+   <label>কার্ডের রং</label>
+   <div class="colors" id="colors"></div>
+   </div>
+   <div id="evf" class="hid">
+    <label for="e_org">সংগঠন / প্রতিষ্ঠানের নাম</label>
+    <input id="e_org" maxlength="80" value="বাংলাদেশ পুস্তক প্রকাশক ও বিক্রেতা সমিতি">
+    <label for="e_sub">শাখা / উপশিরোনাম</label>
+    <input id="e_sub" maxlength="70" value="নাটোর জেলা শাখা, নাটোর">
+    <label for="e_title">অনুষ্ঠানের শিরোনাম</label>
+    <input id="e_title" maxlength="50" value="বার্ষিক সাধারণ সভা">
+    <div class="row">
+     <div><label for="e_year">সাল / উপশিরোনাম</label><input id="e_year" maxlength="30" value="২০২০"></div>
+     <div><label for="e_date">তারিখ</label><input id="e_date" maxlength="40" value="১২ ফেব্রুয়ারি, ২০২১"></div>
+    </div>
+    <div class="row">
+     <div><label for="e_venue">স্থানের নাম</label><input id="e_venue" maxlength="50" value="গ্রীণ ভ্যালী পার্ক"></div>
+     <div><label for="e_addr">স্থানের ঠিকানা</label><input id="e_addr" maxlength="60" value="লালপুর, নাটোর"></div>
+    </div>
+    <label for="logo">লোগো (না দিলে ডিফল্ট বই-আইকন থাকবে)</label>
+    <input id="logo" type="file" accept="image/*">
+    <label>কার্ডের রং</label>
+    <div class="row3">
+     <div><label class="sublabel" for="e_cg">হেডার ও সাল</label><input id="e_cg" type="color" value="#1f7a5a"></div>
+     <div><label class="sublabel" for="e_cr">বর্ডার ও শিরোনাম</label><input id="e_cr" type="color" value="#d4435e"></div>
+     <div><label class="sublabel" for="e_cb">নিচের বার ও ঠিকানা</label><input id="e_cb" type="color" value="#2a5cb8"></div>
+     <div><label class="sublabel" for="e_cp">স্থানের নাম</label><input id="e_cp" type="color" value="#9a2c8e"></div>
+    </div>
+    <p class="hint">লেখা বেশি বড় হলে ফন্ট নিজে থেকে ছোট হয়ে কার্ডের ভেতরেই থাকবে। এই কার্ড এক পাশের (৭০ × ১০০ মিমি)।</p>
+   </div>
+   <div class="btns">
+    <button class="b p" id="add" type="button">তালিকায় যোগ করুন</button>
+    <button class="b hid" id="cedit" type="button">সম্পাদনা বাতিল</button>
+    <button class="b" id="clear" type="button">ফর্ম খালি করুন</button>
+   </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-prev">
+   <h2 id="h-prev">কার্ডের প্রিভিউ</h2>
+   <div class="stage"><div class="zoom" id="pf"></div><div class="zoom" id="pb"></div></div>
+   <div class="btns" style="justify-content:center"><button class="b p" id="showph" type="button">ফোনে দেখান</button><button class="b" id="mkpng" type="button">ছবি বানান</button></div>
+   <p class="hint">“ফোনে দেখান” পুরো পর্দায় কার্ড দেখায়, ট্যাপ করলে উল্টো পাশ আসে। “ছবি বানান” সেভ করার মতো PNG ছবি দেয়। প্রিন্টে দুই পাশই আসবে। আসল মাপ ৫৪ × ৮৬ মিমি, শোয়ানো হলে ৮৬ × ৫৪ মিমি।</p>
+  </section>
+ </div>
+
+ <section class="panel list" aria-labelledby="h-list">
+  <h2 id="h-list">কার্ডের তালিকা (<span id="cnt">০</span> জন)</h2>
+  <div id="items"></div>
+  <div class="btns">
+   <button class="b p" id="print" type="button">সব কার্ড প্রিন্ট করুন</button>
+   <button class="b" id="reset" type="button">তালিকা খালি করুন</button>
+  </div>
+  <div class="btns">
+   <button class="b" id="save" type="button">ডেটা সেভ করুন (JSON)</button>
+   <button class="b" id="load" type="button">ডেটা খুলুন (JSON)</button>
+   <input id="jf" type="file" accept=".json,application/json" class="hid" aria-label="JSON ফাইল বাছুন">
+  </div>
+  <p class="hint" id="msg" role="status">“ডেটা সেভ করুন” চাপলে তালিকার সব কার্ড (ছবি ও লোগো সহ) একটি JSON ফাইলে ডাউনলোড হবে। পরে “ডেটা খুলুন” দিয়ে সেই ফাইল দিলে সব ফিরে আসবে, তারপর “সম্পাদনা” চেপে বদলানো যাবে।</p>
+  <p class="hint">প্রিন্ট ডায়ালগে “Background graphics” চালু রাখুন, তাহলে রং ঠিকমতো আসবে।</p>
+ </section>
+</div>
+<div id="sheet" aria-hidden="true"></div>
+<div id="ov" role="dialog" aria-modal="true" aria-label="ডিজিটাল কার্ড"><div id="ovb"></div><button class="b p" id="ovc" type="button">বন্ধ করুন</button></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+(function(){
+var COLORS=["#1e3a5f","#0f5c63","#7a1f2b","#3b4252"];
+var theme=COLORS[0], photoData="", students=[], editId=null, quiet=false;
+var $=function(id){return document.getElementById(id)};
+var STU=["role","orient","school","saddr","name","cls","roll","sid","blood","phone","valid","addr2"];
+var EV_TXT=["e_org","e_sub","e_title","e_year","e_date","e_venue","e_addr"],EV_COL=["e_cg","e_cr","e_cb","e_cp"];
+var ids=STU.concat(EV_TXT,EV_COL),logoData="";
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function read(){var o={theme:theme,photo:photoData,logo:logoData};ids.forEach(function(i){o[i]=$(i).value.trim()});return o}
+
+
+/* Fit text inside fixed boxes: shrinks only the font (via --k), never lets text spill out */
+function fit(root){
+ Array.prototype.forEach.call(root.querySelectorAll("[data-fit]"),function(b){
+  var sp=b.firstChild,one=b.dataset.fit==="1",k=1;
+  b.style.setProperty("--k",1);
+  for(var i=0;i<25;i++){
+   var br=b.getBoundingClientRect(),sr=sp.getBoundingClientRect();
+   if(!br.width||!br.height)break;
+   var o=one?sr.width/(br.width*.96):Math.max(sr.height/br.height,sp.scrollWidth/(sp.clientWidth||1));
+   if(o<=1)break;
+   k=Math.max(.3,k/o*.97);b.style.setProperty("--k",k);
+   if(k<=.3)break;
+  }
+ });
+}
+function logoSvg(c){c=esc(c);return '<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="'+c+'" d="M3 10Q26 4 50 16Q74 4 97 10L97 62Q74 56 50 74Q26 56 3 62Z"/><path fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" d="M12 30Q32 20 47 36M88 30Q68 20 53 36M50 58L50 70"/><path fill="#fff" d="M50 24C60 34 60 46 50 58C40 46 40 34 50 24Z"/></svg>'}
+function evFront(s){
+ var v=function(x,d){return esc(x||d)},st='--g:'+esc(s.e_cg)+';--r:'+esc(s.e_cr)+';--b:'+esc(s.e_cb)+';--p:'+esc(s.e_cp);
+ return '<div class="card ev" style="'+st+'"><div class="evf">'+
+ '<div class="evh" data-fit="1"><span>'+v(s.e_org)+'</span></div>'+
+ '<div class="evs" data-fit="1"><span>'+v(s.e_sub)+'</span></div>'+
+ '<div class="evt" data-fit="2"><span>'+v(s.e_title)+'</span></div>'+
+ '<div class="evy" data-fit="1"><span>'+v(s.e_year)+'</span></div>'+
+ '<div class="evl">'+(s.logo?'<img alt="" src="'+s.logo+'">':logoSvg(s.e_cb))+'</div>'+
+ '<div class="evv" data-fit="1"><span>'+(s.e_venue?'স্থানঃ '+esc(s.e_venue):'')+'</span></div>'+
+ '<div class="eva" data-fit="1"><span>'+v(s.e_addr)+'</span></div>'+
+ '<div class="evb" data-fit="1"><span>'+(s.e_date?'তারিখঃ '+esc(s.e_date):'')+'</span></div>'+
+ '</div></div>';
+}
+function front(s){
+ if(s.role==="event")return evFront(s);
+ var t=s.role==="teacher",L=s.orient==="land";
+ var ph='<div class="ph">'+(s.photo?'<img alt="" src="'+s.photo+'">':'ছবি')+'</div>';
+ var nm='<div class="nm">'+esc(s.name||(t?"শিক্ষকের নাম":"ছাত্রের নাম"))+'</div>';
+ var dl='<dl><dt>'+(t?"পদবি":"শ্রেণি")+'</dt><dd>'+esc(s.cls)+'</dd><dt>'+(t?"বিষয়":"রোল")+'</dt><dd>'+esc(s.roll)+'</dd><dt>আইডি</dt><dd>'+esc(s.sid)+'</dd>'+(s.blood?'<dt>রক্ত</dt><dd>'+esc(s.blood)+'</dd>':'')+'</dl>';
+ var hd='<div class="hd">'+esc(s.school||"প্রতিষ্ঠানের নাম")+'<small>'+(t?"শিক্ষক":"ছাত্র")+' পরিচয়পত্র</small></div>';
+ var ft='<div class="ft">মেয়াদ: '+esc(s.valid)+'</div>';
+ return L?'<div class="card land" style="--c:'+s.theme+'">'+hd+'<div class="bd">'+ph+'<div class="in">'+nm+dl+'</div></div>'+ft+'</div>':'<div class="card" style="--c:'+s.theme+'">'+hd+ph+nm+dl+ft+'</div>';
+}
+function frontOld(s){
+ return '<div class="card" style="--c:'+s.theme+'"><div class="hd">'+esc(s.school||"প্রতিষ্ঠানের নাম")+'<small>ছাত্র পরিচয়পত্র</small></div>'+
+ '<div class="ph">'+(s.photo?'<img alt="" src="'+s.photo+'">':'ছবি')+'</div>'+
+ '<div class="nm">'+esc(s.name||"ছাত্রের নাম")+'</div>'+
+ '<dl><dt>শ্রেণি</dt><dd>'+esc(s.cls)+'</dd><dt>রোল</dt><dd>'+esc(s.roll)+'</dd><dt>আইডি</dt><dd>'+esc(s.sid)+'</dd>'+
+ (s.blood?'<dt>রক্ত</dt><dd>'+esc(s.blood)+'</dd>':'')+'</dl>'+
+ '<div class="ft">মেয়াদ: '+esc(s.valid)+'</div></div>';
+}
+function back(s){
+ if(s.role==="event")return "";
+ var t=s.role==="teacher",L=s.orient==="land",c='style="--c:'+s.theme+'"';
+ var a='<h4>'+(t?"ঠিকানা":"ছাত্রের ঠিকানা")+'</h4><p>'+esc(s.addr2)+'</p>';
+ var p='<h4>'+(t?"ফোন":"অভিভাবকের ফোন")+'</h4><p>'+esc(s.phone)+'</p>';
+ var o='<h4>প্রতিষ্ঠান</h4><p>'+esc(s.school)+'\n'+esc(s.saddr)+'</p>';
+ var n='<div class="note">কার্ডটি হারিয়ে গেলে বা পেলে উপরের ঠিকানায় যোগাযোগ করুন।</div>';
+ var g='<div class="sig"><br><i></i>প্রধান শিক্ষকের স্বাক্ষর</div>';
+ return L?'<div class="card back land" '+c+'><div>'+a+p+'</div><div>'+o+g+'</div>'+n+'</div>':'<div class="card back" '+c+'>'+a+p+o+n+g+'</div>';
+}
+function backOld(s){
+ return '<div class="card back" style="--c:'+s.theme+'">'+
+ '<h4>ছাত্রের ঠিকানা</h4><p>'+esc(s.addr2)+'</p>'+
+ '<h4>অভিভাবকের ফোন</h4><p>'+esc(s.phone)+'</p>'+
+ '<h4>প্রতিষ্ঠান</h4><p>'+esc(s.school)+'\n'+esc(s.saddr)+'</p>'+
+ '<div class="note">কার্ডটি হারিয়ে গেলে বা পেলে উপরের ঠিকানায় যোগাযোগ করুন।</div>'+
+ '<div class="sig"><br><i></i>প্রধান শিক্ষকের স্বাক্ষর</div></div>';
+}
+function applyRole(){var ev=$("role").value==="event";$("stf").classList.toggle("hid",ev);$("evf").classList.toggle("hid",!ev);$("orw").classList.toggle("hid",ev);$("h-form").textContent=ev?"ইভেন্ট ব্যাজের তথ্য":($("role").value==="teacher"?"শিক্ষকের তথ্য":"ছাত্রের তথ্য");var t=$("role").value==="teacher",q=function(f,x){document.querySelector('label[for="'+f+'"]').textContent=x};q("name",t?"শিক্ষকের নাম":"ছাত্রের নাম");q("cls",t?"পদবি":"শ্রেণি");q("roll",t?"বিষয়":"রোল");q("sid",t?"ইনডেক্স / আইডি":"আইডি নম্বর");q("phone",t?"ফোন নম্বর":"অভিভাবকের ফোন");q("addr2",t?"ঠিকানা":"ছাত্রের ঠিকানা")}
+function preview(){applyRole();var s=read();$("pf").innerHTML=front(s);$("pb").innerHTML=back(s);fit($("pf"));fit($("pb"))}
+function closeOv(){$("ov").classList.remove("on");$("ovb").innerHTML=""}
+function showPhone(){
+ var s=read(),side=0,cards=[front(s)],b=back(s);
+ if(b)cards.push(b);
+ var two=cards.length>1;
+ $("ovb").innerHTML='<div id="zw"></div>'+(two?'<p>কার্ডে ট্যাপ করলে উল্টো পাশ দেখাবে</p>':'');
+ $("ov").classList.add("on");
+ function draw(){var w=$("zw");w.style.zoom=1;w.innerHTML=cards[side];fit(w);var c=w.firstChild;w.style.zoom=Math.min(innerWidth*.9/c.offsetWidth,innerHeight*.7/c.offsetHeight)}
+ $("zw").onclick=function(){if(two){side=1-side;draw()}};
+ draw();$("ovc").focus();
+}
+function makePng(){
+ if(!window.html2canvas){alert("ছবি তৈরির লাইব্রেরি লোড হয়নি। ইন্টারনেট সংযোগ দেখুন।");return}
+ var s=read(),h=document.createElement("div");
+ h.style.cssText="position:fixed;left:-9999px;top:0;display:flex;gap:8px";
+ h.innerHTML=front(s)+back(s);document.body.appendChild(h);
+ var o={scale:4,backgroundColor:null},kids=Array.prototype.slice.call(h.children);
+ (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){
+  fit(h);return Promise.all(kids.map(function(k){return html2canvas(k,o)}));
+ }).then(function(r){
+  document.body.removeChild(h);
+  $("ovb").innerHTML=r.map(function(c,i){return '<img alt="'+(i?"কার্ডের পেছনের পাশ":"কার্ডের সামনের পাশ")+'" src="'+c.toDataURL("image/png")+'">'}).join("")+'<p>ছবিতে চেপে ধরে রাখুন (কম্পিউটারে রাইট ক্লিক করুন), তারপর ছবি সেভ করুন।</p>';
+  $("ov").classList.add("on");$("ovc").focus();
+ }).catch(function(){if(h.parentNode)document.body.removeChild(h);alert("ছবি তৈরি করা যায়নি।")});
+}
+
+function bn(n){return String(n).replace(/\d/g,function(d){return "০১২৩৪৫৬৭৮৯"[d]})}
+function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
+function setEdit(id){editId=id;$("add").textContent=id?"আপডেট করুন":"তালিকায় যোগ করুন";$("cedit").classList.toggle("hid",!id)}
+function renderList(){
+ students.forEach(function(s,i){if(!s.id)s.id=newId();if(!s.ts)s.ts=Date.now()+i});
+ if(editId&&!students.some(function(s){return s.id===editId}))setEdit(null);
+ $("cnt").textContent=bn(students.length);
+ var h=students.length?"":'<p class="empty">এখনো কেউ যোগ হয়নি। ফর্ম পূরণ করে “তালিকায় যোগ করুন” চাপুন।</p>';
+ students.forEach(function(s,i){
+  var ev=s.role==="event";
+  h+='<div class="item">'+((ev?s.logo:s.photo)?'<img alt="" src="'+(ev?s.logo:s.photo)+'">':'<span class="ph"></span>')+
+  '<div class="t">'+esc(ev?s.e_title:s.name)+'<small>'+(ev?"ইভেন্ট ব্যাজ: "+esc(s.e_date):s.role==="teacher"?"শিক্ষক: "+esc(s.cls)+", "+esc(s.roll):"শ্রেণি "+esc(s.cls)+", রোল "+esc(s.roll))+(s.orient==="land"?" (শোয়ানো)":"")+(s.id===editId?" — সম্পাদনা চলছে":"")+'</small></div>'+
+  '<button class="b" type="button" data-e="'+i+'">সম্পাদনা</button> <button class="b" type="button" data-d="'+i+'">মুছুন</button></div>';
+ });
+ $("items").innerHTML=h;
+ if(!quiet&&window.IDC&&window.IDC.onList)window.IDC.onList(students);
+}
+function fill(s){ids.forEach(function(i){if(s[i]!==undefined)$(i).value=s[i]});photoData=s.photo||"";logoData=s.logo||"";setTheme(s.theme||COLORS[0]);preview()}
+function setTheme(c){theme=c;Array.prototype.forEach.call($("colors").children,function(b){b.setAttribute("aria-pressed",b.dataset.c===c)});preview()}
+
+COLORS.forEach(function(c){var b=document.createElement("button");b.type="button";b.className="sw";b.style.background=c;b.dataset.c=c;b.setAttribute("aria-label","রং "+c);b.onclick=function(){setTheme(c)};$("colors").appendChild(b)});
+setTheme(theme);
+
+ids.forEach(function(i){$(i).addEventListener("input",preview)});
+$("photo").addEventListener("change",function(e){
+ var f=e.target.files[0];if(!f)return;
+ var r=new FileReader();r.onload=function(){
+  var im=new Image();im.onload=function(){
+   var w=300,h=Math.round(im.height*w/im.width),c=document.createElement("canvas");
+   if(h<w*1.1){h=360;w=Math.round(im.width*h/im.height)}
+   c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);
+   photoData=c.toDataURL("image/jpeg",.85);preview()};
+  im.src=r.result};r.readAsDataURL(f);
+});
+$("add").onclick=function(){
+ var ev=$("role").value==="event",k=ev?"e_title":"name";
+ if(!$(k).value.trim()){$(k).focus();return}
+ var o=read(),ix=editId?students.findIndex(function(x){return x.id===editId}):-1;
+ if(ix>=0){o.id=editId;o.ts=students[ix].ts;students[ix]=o}else students.push(o);
+ setEdit(null);renderList();
+ if(!ev){["name","roll","sid"].forEach(function(i){$(i).value=""});photoData="";$("photo").value="";preview()}
+ $(k).focus();
+};
+$("clear").onclick=function(){
+ if($("role").value==="event"){EV_TXT.forEach(function(i){$(i).value=""});logoData="";$("logo").value=""}
+ else{["school","saddr","name","cls","roll","sid","blood","phone","valid","addr2"].forEach(function(i){$(i).value=""});photoData="";$("photo").value=""}
+ preview();
+};
+$("logo").addEventListener("change",function(e){
+ var f=e.target.files[0];if(!f){logoData="";preview();return}
+ var r=new FileReader();r.onload=function(){
+  var im=new Image();im.onload=function(){
+   if(!im.width||!im.height)return;
+   var sc=Math.min(1,300/Math.max(im.width,im.height)),w=Math.round(im.width*sc),h=Math.round(im.height*sc),c=document.createElement("canvas");
+   c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);
+   logoData=c.toDataURL("image/png");
+   if(logoData.length>450000){var c2=document.createElement("canvas");c2.width=w;c2.height=h;var x=c2.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);logoData=c2.toDataURL("image/jpeg",.85)}
+   preview()};
+  im.src=r.result};r.readAsDataURL(f);
+});
+$("items").onclick=function(e){
+ var t=e.target;
+ if(t.dataset.d!==undefined){students.splice(+t.dataset.d,1);renderList()}
+ if(t.dataset.e!==undefined){var i=+t.dataset.e;fill(students[i]);setEdit(students[i].id);renderList();window.scrollTo({top:0,behavior:"smooth"})}
+};
+$("reset").onclick=function(){if(students.length&&confirm("তালিকার সবাইকে মুছে ফেলবেন?")){students=[];setEdit(null);renderList()}};
+$("cedit").onclick=function(){setEdit(null);renderList()};
+$("print").onclick=function(){
+ var list=students.length?students:[read()];
+ var sh=$("sheet");sh.innerHTML=list.map(function(s){return front(s)+back(s)}).join("");
+ sh.style.cssText="display:flex;flex-wrap:wrap;gap:4mm;position:fixed;left:-9999px;top:0;width:194mm";fit(sh);sh.style.cssText="";
+ window.print();
+};
+$("showph").onclick=showPhone;$("mkpng").onclick=makePng;$("ovc").onclick=closeOv;
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeOv()});
+
+function say(t){$("msg").textContent=t}
+function clean(o){
+ if(!o||typeof o!=="object"||Array.isArray(o))return null;
+ var r={},sel=function(id,v){return Array.prototype.some.call($(id).options,function(x){return x.value===v})};
+ ids.forEach(function(i){
+  var v=typeof o[i]==="string"?o[i].slice(0,300):"";
+  if(EV_COL.indexOf(i)>=0){r[i]=/^#[0-9a-f]{6}$/i.test(v)?v:$(i).defaultValue}
+  else if(i==="role"||i==="orient"||i==="blood"){r[i]=sel(i,v)?v:(i==="blood"?"":$(i).options[0].value)}
+  else r[i]=v;
+ });
+ r.theme=COLORS.indexOf(o.theme)>=0?o.theme:COLORS[0];
+ ["photo","logo"].forEach(function(k){r[k]=typeof o[k]==="string"&&o[k].indexOf("data:image/")===0&&o[k].length<3e6?o[k]:""});
+ return r;
+}
+$("save").onclick=function(){
+ var list=students.length?students:[read()];
+ var blob=new Blob([JSON.stringify({app:"id-card-tool",version:1,exportedAt:new Date().toISOString(),cards:list},null,1)],{type:"application/json"});
+ var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="id-cards-"+new Date().toISOString().slice(0,10)+".json";
+ document.body.appendChild(a);a.click();document.body.removeChild(a);
+ setTimeout(function(){URL.revokeObjectURL(a.href)},1500);
+ say(bn(list.length)+" টি কার্ডের ডেটা ডাউনলোড হয়েছে"+(students.length?"।":" (তালিকা খালি ছিল, তাই ফর্মের বর্তমান ডেটা সেভ হয়েছে)।"));
+};
+$("load").onclick=function(){$("jf").click()};
+$("jf").addEventListener("change",function(e){
+ var f=e.target.files[0];if(!f)return;
+ var r=new FileReader();
+ r.onerror=function(){say("ফাইলটি পড়া যায়নি।")};
+ r.onload=function(){
+  var d,list;
+  try{d=JSON.parse(r.result)}catch(x){say("এটি সঠিক JSON ফাইল নয়, তাই খোলা যায়নি।");$("jf").value="";return}
+  list=Array.isArray(d)?d:(d&&Array.isArray(d.cards)?d.cards:[d]);
+  list=list.slice(0,1000).map(clean).filter(Boolean);
+  if(!list.length){say("ফাইলে কোনো কার্ডের ডেটা পাওয়া যায়নি।");$("jf").value="";return}
+  students=students.concat(list);renderList();
+  say(bn(list.length)+" টি কার্ড তালিকায় যোগ হয়েছে। বদলাতে চাইলে নামের পাশে “সম্পাদনা” চাপুন।");
+  $("jf").value="";
+ };
+ r.readAsText(f);
+});
+window.IDC={
+ list:function(){return students},
+ load:function(list){
+  students=list.map(function(o){var r=clean(o);if(r){r.id=String(o&&o.id||"");r.ts=+(o&&o.ts)||0}return r}).filter(Boolean);
+  quiet=true;try{renderList()}finally{quiet=false}
+ },
+ onList:null,ready:false
+};
+setTimeout(function(){if(!window.IDC.ready){var e=$("cl-st");e.textContent="ক্লাউডে সংযোগ করা যায়নি (ইন্টারনেট দেখুন)। এখন ডেটা শুধু এই পেজে থাকবে, JSON দিয়ে সেভ করতে পারেন।";e.className="cl-st cl-err"}},10000);
+renderList();preview();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(preview);
+})();
+</script>
+<script type="module">
+/* Firebase: Email/Password login + Firestore (users/{uid}/cards/{cardId}) */
+const V="10.14.1",B="https://www.gstatic.com/firebasejs/"+V+"/";
+const firebaseConfig={
+ apiKey:"AIzaSyBRUNHoEsduSQs0Z6HJ3wrRlRXIafyWWCg",
+ authDomain:"id-card-generator-2bb57.firebaseapp.com",
+ projectId:"id-card-generator-2bb57",
+ storageBucket:"id-card-generator-2bb57.firebasestorage.app",
+ messagingSenderId:"666964069380",
+ appId:"1:666964069380:web:6701878de311a809233951"
+};
+const $=id=>document.getElementById(id),bn=n=>String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const st=(t,k)=>{const e=$("cl-st");e.textContent=t;e.className="cl-st"+(k?" cl-"+k:"")};
+const ERR={
+ "auth/invalid-credential":"ইমেইল বা পাসওয়ার্ড ভুল।","auth/wrong-password":"পাসওয়ার্ড ভুল।","auth/user-not-found":"এই ইমেইলে অ্যাকাউন্ট নেই।",
+ "auth/invalid-email":"ইমেইলটি সঠিক নয়।","auth/email-already-in-use":"এই ইমেইলে আগেই অ্যাকাউন্ট খোলা আছে, লগইন করুন।",
+ "auth/weak-password":"পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের দিন।","auth/missing-password":"পাসওয়ার্ড লিখুন।","auth/missing-email":"ইমেইল লিখুন।",
+ "auth/too-many-requests":"অনেকবার চেষ্টা হয়েছে, একটু পরে আবার দিন।","auth/network-request-failed":"ইন্টারনেট সংযোগ নেই।",
+ "auth/operation-not-allowed":"Firebase Console → Authentication → Sign-in method থেকে Email/Password চালু করুন।",
+ "permission-denied":"অনুমতি নেই। Firestore Rules ঠিক করা হয়েছে কি না দেখুন (firestore.rules ফাইল)।",
+ "unavailable":"সার্ভারে পৌঁছানো যাচ্ছে না, ইন্টারনেট দেখুন।","failed-precondition":"Firebase Console এ Firestore Database তৈরি করা হয়েছে কি না দেখুন।"
+};
+const em=e=>ERR[e&&e.code]||ERR[String(e&&e.code||"").replace("firestore/","")]||("ত্রুটি: "+(e&&(e.code||e.message)||"অজানা"));
+
+let fb;
+try{
+ const [a,au,fs]=await Promise.all([import(B+"firebase-app.js"),import(B+"firebase-auth.js"),import(B+"firebase-firestore.js")]);
+ fb={a,au,fs};
+}catch(e){ /* the page's own 10 s notice explains the offline state */ }
+
+if(fb){
+ const {initializeApp}=fb.a,{getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail}=fb.au,{getFirestore,collection,doc,getDocs,writeBatch}=fb.fs;
+ const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+ const IDC=window.IDC;let user=null,synced=new Map(),timer=0,running=false,dirty=false,warned=new Set(),busy=false;
+ const cards=()=>collection(db,"users",user.uid,"cards");
+ const setBusy=b=>{busy=b;["cl-login","cl-signup","cl-forgot","cl-refresh","cl-logout"].forEach(i=>$(i).disabled=b)};
+ const who=()=>"লগইন: "+user.email;
+
+ async function flush(){
+  if(!user)return;
+  if(running){dirty=true;return}
+  running=true;
+  try{
+   do{
+    dirty=false;
+    const uid=user.uid,list=IDC.list(),cur=new Map(),ops=[];
+    for(const s of list){
+     const j=JSON.stringify(s);cur.set(s.id,j);
+     if(synced.get(s.id)===j)continue;
+     if(new Blob([j]).size>900000){if(!warned.has(s.id)){warned.add(s.id);st("একটি কার্ডের ডেটা (ছবি/লোগো) ১ MB-এর বেশি, তাই ক্লাউডে সেভ হয়নি। ছোট ছবি দিন।","err")}continue}
+     ops.push({t:"set",id:s.id,j});
+    }
+    synced.forEach((_,id)=>{if(!cur.has(id))ops.push({t:"del",id})});
+    if(!ops.length)continue;
+    st("সংরক্ষণ হচ্ছে…");
+    for(let i=0;i<ops.length;i+=400){
+     const part=ops.slice(i,i+400),b=writeBatch(db);
+     part.forEach(o=>{const r=doc(db,"users",uid,"cards",o.id);o.t==="set"?b.set(r,JSON.parse(o.j)):b.delete(r)});
+     await b.commit();
+     part.forEach(o=>o.t==="set"?synced.set(o.id,o.j):synced.delete(o.id));
+    }
+    if(!warned.size)st(who()+" — ✓ "+bn(list.length)+" টি কার্ড ক্লাউডে সংরক্ষিত","ok");
+   }while(dirty);
+  }catch(e){st("সংরক্ষণ হয়নি: "+em(e),"err")}
+  finally{running=false}
+ }
+ IDC.onList=()=>{if(!user)return;clearTimeout(timer);timer=setTimeout(flush,700)};
+
+ async function pull(replace){
+  const snap=await getDocs(cards());
+  const cloud=snap.docs.map(d=>d.data()).sort((x,y)=>(x.ts||0)-(y.ts||0));
+  const ids=new Set(cloud.map(c=>String(c.id)));
+  const local=replace?[]:IDC.list().filter(s=>!ids.has(s.id));
+  IDC.load(cloud.concat(local));
+  synced=new Map();warned=new Set();
+  IDC.list().forEach(s=>{if(ids.has(s.id))synced.set(s.id,JSON.stringify(s))});
+  return local.length;
+ }
+ async function enter(){
+  setBusy(true);st("ক্লাউড থেকে ডেটা আনা হচ্ছে…");
+  try{
+   const added=await pull(false);
+   st(who()+" — "+bn(IDC.list().length)+" টি কার্ড লোড হয়েছে","ok");
+   if(added)await flush();
+  }catch(e){st("ডেটা আনা যায়নি: "+em(e),"err")}
+  setBusy(false);
+ }
+
+ onAuthStateChanged(auth,u=>{
+  user=u||null;IDC.ready=true;
+  $("cl-in").classList.toggle("hid",!!user);$("cl-out").classList.toggle("hid",!user);
+  if(user)enter();
+  else st("লগইন করা নেই। লগইন করলে সব কার্ড ক্লাউডে সংরক্ষিত থাকবে এবং যেকোনো ডিভাইস থেকে খোলা যাবে।");
+ });
+
+ const creds=()=>[$("cl-email").value.trim(),$("cl-pass").value];
+ $("cl-in").addEventListener("submit",async ev=>{
+  ev.preventDefault();const [e,p]=creds();setBusy(true);st("লগইন হচ্ছে…");
+  try{await signInWithEmailAndPassword(auth,e,p);$("cl-pass").value=""}catch(x){st(em(x),"err")}
+  setBusy(false);
+ });
+ $("cl-signup").onclick=async()=>{
+  const [e,p]=creds();setBusy(true);st("অ্যাকাউন্ট খোলা হচ্ছে…");
+  try{await createUserWithEmailAndPassword(auth,e,p);$("cl-pass").value=""}catch(x){st(em(x),"err")}
+  setBusy(false);
+ };
+ $("cl-forgot").onclick=async()=>{
+  const [e]=creds();if(!e){st("আগে ইমেইল ঘরে ইমেইল লিখুন।","err");$("cl-email").focus();return}
+  setBusy(true);
+  try{await sendPasswordResetEmail(auth,e);st("পাসওয়ার্ড রিসেটের লিংক ইমেইলে পাঠানো হয়েছে (স্প্যাম ফোল্ডারও দেখুন)।","ok")}catch(x){st(em(x),"err")}
+  setBusy(false);
+ };
+ $("cl-refresh").onclick=async()=>{
+  setBusy(true);st("নতুন করে আনা হচ্ছে…");
+  try{clearTimeout(timer);await flush();await pull(true);st(who()+" — "+bn(IDC.list().length)+" টি কার্ড লোড হয়েছে","ok")}catch(x){st("ডেটা আনা যায়নি: "+em(x),"err")}
+  setBusy(false);
+ };
+ $("cl-logout").onclick=async()=>{
+  if(!confirm("লগআউট করলে এই পেজ থেকে তালিকা সরে যাবে (ক্লাউডে ডেটা থেকে যাবে)। এগিয়ে যাবেন?"))return;
+  clearTimeout(timer);setBusy(true);
+  try{await flush();await signOut(auth);IDC.load([]);synced=new Map()}catch(x){st(em(x),"err")}
+  setBusy(false);
+ };
+ window.addEventListener("beforeunload",e=>{if(user&&(running||timer&&IDC.list().some(s=>synced.get(s.id)!==JSON.stringify(s)))){e.preventDefault();e.returnValue=""}});
+}
+</script>
+</body>
+</html>
